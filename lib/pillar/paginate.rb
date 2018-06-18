@@ -3,10 +3,8 @@ module Pillar
 
     attr_reader :options
 
-    DEFAULT_SCOPE   = ->(per_page, page, query){ query.limit(per_page).offset(page * per_page) }
-    DEFAULT_OPTIONS = {
-      per_page: 20,
-    }
+    DEFAULT_SCOPE   = ->(per_page, page, query) { query.limit(per_page).offset((page - 1) * per_page) }
+    DEFAULT_OPTIONS = { per_page: 20 }.freeze
 
     def initialize(args = {})
       @param   = args.delete(:param) || :page
@@ -21,8 +19,8 @@ module Pillar
     private
 
       def page(params)
-        num = (params[@param] || 0).to_i
-        num = 0 if num < 0
+        num = (params[@param] || 1).to_i
+        num = 1 if num < 1
 
         return num
       end

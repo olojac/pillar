@@ -23,14 +23,21 @@ module Pillar
     end
 
     def paginate(params)
+      raise ArgumentError, "paginate is not specified on this model" if @store.paginate.nil? 
       @query = @store.paginate(params).call(@query)
 
       return @query
     end
 
-    private
+    def filter(params)
+      raise ArgumentError, "filter is not specified on this model" if @store.filter.nil?
+      return @query if params[@store.filter.param].blank?
+      @query = @store.filter(params).call(@query)
 
-      POSSIBLE_OPERATIONS = [:sort, :paginate]
+      return @query
+    end
+
+    POSSIBLE_OPERATIONS = [:sort, :paginate, :filter].freeze
 
   end
 end

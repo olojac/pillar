@@ -1,8 +1,14 @@
 require "pillar/store"
-require "pillar/view_helpers"
+require "pillar/view_helpers/filter"
+require "pillar/view_helpers/sort"
+require "pillar/view_helpers/paginate"
 
 require "active_support"
-ActiveSupport.on_load(:action_view) { include Pillar::ViewHelpers }
+ActiveSupport.on_load(:action_view) {
+  include Pillar::ViewHelpers::Filter
+  include Pillar::ViewHelpers::Sort
+  include Pillar::ViewHelpers::Paginate
+}
 
 module Pillar
   def self.included(klass)
@@ -12,7 +18,9 @@ module Pillar
       when :sort
         klass.class_variable_get("@@pillar_store").add_sort(args)
       when :paginate
-        klass.class_variable_get("@@pillar_store").set_paginate(args)
+        klass.class_variable_get("@@pillar_store").add_paginate(args)
+      when :filter
+        klass.class_variable_get("@@pillar_store").add_filter(args)
       else
         klass.class_variable_get("@@pillar_store")
       end

@@ -5,7 +5,7 @@ module Pillar
     attr_reader :scope
     attr_reader :options
 
-    DEFAULT_SCOPE   = ->(param, direction, query) { query.order("#{param} #{direction}") }
+    DEFAULT_SCOPE   = ->(param, direction, query) { query.order(param.to_sym => direction.to_sym) }
     DEFAULT_OPTIONS = {
       default_direction: :asc,
     }

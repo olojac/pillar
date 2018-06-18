@@ -1,5 +1,6 @@
 require "pillar/paginate"
 require "pillar/sort"
+require "pillar/filter"
 require "pillar/query"
 
 module Pillar
@@ -7,7 +8,8 @@ module Pillar
 
     def initialize
       @sort_store     = ActiveSupport::HashWithIndifferentAccess.new
-      @paginate_store = Paginate.new
+      @paginate_store = nil
+      @filter_store   = nil
     end
 
     def query(input_query)
@@ -29,14 +31,24 @@ module Pillar
       @paginate_store.scope(params)
     end
 
+    def filter(params = nil)
+      return @filter_store if params.nil?
+      
+      @filter_store.scope(params)
+    end
+
     def add_sort(args)
       sort_column = Sort.new(args)
       define_singleton_method(sort_column.param) { @sort_store[sort_column.param] }
       @sort_store[sort_column.param] = sort_column
     end
 
-    def set_paginate(args)
+    def add_paginate(args)
       @paginate_store = Paginate.new(args)
+    end
+
+    def add_filter(args)
+      @filter_store = Filter.new(args)
     end
 
     def to_h
