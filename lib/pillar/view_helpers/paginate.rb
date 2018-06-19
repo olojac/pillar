@@ -63,6 +63,7 @@ module Pillar
           max  = total / per_page - 1
           rest = total % per_page
           max += 1 if rest.positive?
+          max += 1 # page starts at 1
 
           return max
         end
