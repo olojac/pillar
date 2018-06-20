@@ -11,7 +11,7 @@ module Pillar
     }
 
     def initialize(args)
-      raise ArgumentError, "parameter 'param:' is required for pillar :sort" if args[:param].nil?
+      raise ArgumentError, "parameter 'param:' is required for pillar :sort" if args&.fetch(:param).nil?
 
       @param   = args.delete(:param)
       @scope   = args.delete(:scope) || DEFAULT_SCOPE.curry.call(@param)

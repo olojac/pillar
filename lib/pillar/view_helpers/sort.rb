@@ -7,9 +7,13 @@ module Pillar
         direction ||= column.options[:default_direction].to_s
 
         link_to(
-          "#{label} #{column_icon(column, direction)}".html_safe,
+          pillar_sort_label(label, column_icon(column, direction)),
           current_path_with_params(direction: flip_direction(column, direction), sort: column.param, page: nil)
         )
+      end
+
+      def pillar_sort_label(text, icon)
+        "#{text} #{icon}".html_safe
       end
 
       def pillar_sort_asc_icon
