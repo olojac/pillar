@@ -4,7 +4,7 @@ module Pillar
 
       def pillar_sort_link(label, column)
         direction   = params[:direction] if current_column?(column)
-        direction ||= column.options[:default_direction].to_s
+        direction ||= column.default_direction.to_s
 
         link_to(
           pillar_sort_label(label, column_icon(column, direction)),

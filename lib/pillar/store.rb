@@ -20,12 +20,10 @@ module Pillar
     def sort(params = nil)
       return @sort_stores if params.nil?
 
-      param       = params[:sort]
-      sort_column = @sort_stores[param] || @sort_stores.values.first
-      direction   = params[:direction] || sort_column.options[:default_direction].to_s
-      sort_scope  = sort_column.scope.curry
+      param      = params[:sort]
+      sort_store = @sort_stores[param] || @sort_stores.values.first
 
-      return sort_scope.call(direction)
+      return sort_store.scope(params)
     end
 
     def paginate(params = nil)

@@ -1,7 +1,7 @@
 module Support
   class MockQuery < BasicObject
 
-    CATCH = [:order, :custom, :limit, :offset, :stop_after, :move].freeze
+    CATCH = [:order, :custom, :limit, :offset, :stop_after, :move, :where, :search].freeze
 
     attr_reader :args_called
     attr_reader :methods_called

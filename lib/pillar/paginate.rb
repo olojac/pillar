@@ -1,20 +1,17 @@
 module Pillar
   class Paginate
 
-    attr_reader :options
-
-    DEFAULT_SCOPE   = ->(per_page, page, query) { query.limit(per_page).offset((page - 1) * per_page) }
-    DEFAULT_OPTIONS = { per_page: 20 }.freeze
+    DEFAULT_SCOPE = ->(per_page, page, query) { query.limit(per_page).offset((page - 1) * per_page) }
 
     def initialize(args = {})
-      args   ||= {}
-      @param   = args&.delete(:param) || :page
-      @scope   = args&.delete(:scope) || DEFAULT_SCOPE
-      @options = DEFAULT_OPTIONS.merge(args)
+      args    ||= {}
+      @param    = args&.delete(:param)    || :page
+      @scope    = args&.delete(:scope)    || DEFAULT_SCOPE
+      @per_page = args&.delete(:per_page) || 20
     end
 
     def scope(params)
-      @scope.curry.call(@options[:per_page], page(params))
+      @scope.curry.call(@per_page, page(params))
     end
 
     def pages(current, item_count)
@@ -37,8 +34,8 @@ module Pillar
 
       def pages_count(item_count)
         return Float::INFINITY if item_count.nil?
-        max  = item_count / @options[:per_page] - 1
-        rest = item_count % @options[:per_page]
+        max  = item_count / @per_page - 1
+        rest = item_count % @per_page
         max += 1 if rest.positive?
         max += 1 # page starts at 1
 

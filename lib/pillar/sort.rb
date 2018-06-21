@@ -2,20 +2,20 @@ module Pillar
   class Sort
 
     attr_reader :param
-    attr_reader :scope
-    attr_reader :options
+    attr_reader :default_direction
 
-    DEFAULT_SCOPE   = ->(param, direction, query) { query.order(param.to_sym => direction.to_sym) }
-    DEFAULT_OPTIONS = {
-      default_direction: :asc,
-    }
+    DEFAULT_SCOPE = ->(param, direction, query) { query.order(param.to_sym => direction.to_sym) }
 
     def initialize(args)
       raise ArgumentError, "parameter 'param:' is required for pillar :sort" if args&.fetch(:param).nil?
 
-      @param   = args.delete(:param)
-      @scope   = args.delete(:scope) || DEFAULT_SCOPE.curry.call(@param)
-      @options = DEFAULT_OPTIONS.merge(args)
+      @param             = args&.delete(:param)
+      @scope             = args&.delete(:scope) || DEFAULT_SCOPE.curry.call(@param)
+      @default_direction = args&.delete(:default_direction) || :asc
+    end
+
+    def scope(params)
+      @scope.curry.call(params[:direction] || default_direction.to_s)
     end
 
   end
