@@ -9,8 +9,8 @@ class SortTest < ActiveSupport::TestCase
     }
     query = klass.pillar.query(Support::MockQuery.new).with(:sort, {})
 
-    assert(query.method_called == :order)
-    assert(query.args_called   == [{ name: :asc }])
+    assert(query.last_method_called == :order)
+    assert(query.last_args_called   == [{ name: :asc }])
   end
 
   test "with a direction" do
@@ -20,8 +20,8 @@ class SortTest < ActiveSupport::TestCase
     }
     query = klass.pillar.query(Support::MockQuery.new).with(:sort, direction: "desc")
 
-    assert(query.method_called == :order)
-    assert(query.args_called   == [{ name: :desc }])
+    assert(query.last_method_called == :order)
+    assert(query.last_args_called   == [{ name: :desc }])
   end
 
   test "with a default direction" do
@@ -31,8 +31,8 @@ class SortTest < ActiveSupport::TestCase
     }
     query = klass.pillar.query(Support::MockQuery.new).with(:sort, {})
 
-    assert(query.method_called == :order)
-    assert(query.args_called   == [{ name: :desc }])
+    assert(query.last_method_called == :order)
+    assert(query.last_args_called   == [{ name: :desc }])
   end
 
   test "with a custom scope" do
@@ -42,8 +42,8 @@ class SortTest < ActiveSupport::TestCase
     }
     query = klass.pillar.query(Support::MockQuery.new).with(:sort, {})
 
-    assert(query.method_called == :custom)
-    assert(query.args_called   == ["name asc"])
+    assert(query.last_method_called == :custom)
+    assert(query.last_args_called   == ["name asc"])
   end
 
   test "with missing param" do

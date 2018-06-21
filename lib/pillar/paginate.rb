@@ -7,8 +7,9 @@ module Pillar
     DEFAULT_OPTIONS = { per_page: 20 }.freeze
 
     def initialize(args = {})
-      @param   = args.delete(:param) || :page
-      @scope   = args.delete(:scope) || DEFAULT_SCOPE
+      args   ||= {}
+      @param   = args&.delete(:param) || :page
+      @scope   = args&.delete(:scope) || DEFAULT_SCOPE
       @options = DEFAULT_OPTIONS.merge(args)
     end
 
