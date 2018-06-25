@@ -7,7 +7,7 @@ module Pillar
           concat content_tag(:div, class: "input-group") {
             concat text_field_tag(filter.param, params[filter.param], class: "form-control")
             concat content_tag(:div, class: "input-group-append") {
-              concat link_to(icon("x"), params.merge(filter: "").permit!, class: "btn btn-outline-secondary")
+              concat link_to("Clear", params.merge(filter: "").permit!, class: "btn btn-outline-secondary")
               concat button_tag("Filter", name: "", class: "btn btn-primary")
             }
           }
