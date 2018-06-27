@@ -18,5 +18,27 @@ module Pillar
       @scope.curry.call(params[:direction] || default_direction.to_s)
     end
 
+    def direction(params)
+      direction   = params[:direction] if selected?(params)
+      direction ||= default_direction.to_s
+
+      return direction
+    end
+
+    def next_direction(params)
+      return direction(params) unless selected?(params)
+
+      case direction(params)
+      when "asc"
+        "desc"
+      when "desc"
+        "asc"
+      end
+    end
+
+    def selected?(params)
+      params[:sort] == param.to_s
+    end
+
   end
 end

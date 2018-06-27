@@ -55,4 +55,68 @@ class SortTest < ActiveSupport::TestCase
     end
   end
 
+  test "helpers with default direction" do
+    klass = Class.new {
+      include Pillar
+      pillar :sort, param: :name
+    }
+    column = klass.pillar.sort[:name]
+
+    # selected
+    params = { sort: "name" }
+    assert(column.direction(params)      == "asc")
+    assert(column.next_direction(params) == "desc")
+    assert(column.selected?(params)      == true)
+
+    # selected with direction
+    params = { sort: "name", direction: "desc" }
+    assert(column.direction(params)      == "desc")
+    assert(column.next_direction(params) == "asc")
+    assert(column.selected?(params)      == true)
+
+    # not selected
+    params = { sort: "other" }
+    assert(column.direction(params)      == "asc")
+    assert(column.next_direction(params) == "asc")
+    assert(column.selected?(params)      == false)
+
+    # not selected with direction
+    params = { sort: "other", direction: "desc" }
+    assert(column.direction(params)      == "asc")
+    assert(column.next_direction(params) == "asc")
+    assert(column.selected?(params)      == false)
+  end
+
+  test "helpers with reverse default direction" do
+    klass = Class.new {
+      include Pillar
+      pillar :sort, param: :name, default_direction: :desc
+    }
+    column = klass.pillar.sort[:name]
+
+    # selected
+    params = { sort: "name" }
+    assert(column.direction(params)      == "desc")
+    assert(column.next_direction(params) == "asc")
+    assert(column.selected?(params)      == true)
+
+    # selected with direction
+    params = { sort: "name", direction: "asc" }
+    assert(column.direction(params)      == "asc")
+    assert(column.next_direction(params) == "desc")
+    assert(column.selected?(params)      == true)
+
+    # not selected
+    params = { sort: "other" }
+    assert(column.direction(params)      == "desc")
+    assert(column.next_direction(params) == "desc")
+    assert(column.selected?(params)      == false)
+
+    # not selected with direction
+    params = { sort: "other", direction: "asc" }
+    assert(column.direction(params)      == "desc")
+    assert(column.next_direction(params) == "desc")
+    assert(column.selected?(params)      == false)
+  end
+
 end

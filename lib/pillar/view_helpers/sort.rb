@@ -3,12 +3,9 @@ module Pillar
     module Sort
 
       def pillar_sort_link(label, column)
-        direction   = params[:direction] if current_column?(column)
-        direction ||= column.default_direction.to_s
-
         link_to(
-          pillar_sort_label(label, column_icon(column, direction)),
-          current_path_with_params(direction: flip_direction(column, direction), sort: column.param, page: nil)
+          pillar_sort_label(label, column_icon(column, params)),
+          current_path_with_params(direction: column.next_direction(params), sort: column.param, page: nil)
         )
       end
 
@@ -26,29 +23,14 @@ module Pillar
 
       private
 
-        def current_column?(column)
-          params[:sort] == column.param.to_s
-        end
+        def column_icon(column, params)
+          return "" unless column.selected?(params)
 
-        def column_icon(column, direction)
-          return "" unless current_column?(column)
-
-          case direction
+          case column.direction(params)
           when "asc"
             pillar_sort_asc_icon
           when "desc"
             pillar_sort_desc_icon
-          end
-        end
-
-        def flip_direction(column, current_direction)
-          return current_direction unless current_column?(column)
-
-          case current_direction
-          when "asc"
-            "desc"
-          when "desc"
-            "asc"
           end
         end
 
