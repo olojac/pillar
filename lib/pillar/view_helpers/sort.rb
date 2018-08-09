@@ -2,10 +2,16 @@ module Pillar
   module ViewHelpers
     module Sort
 
-      def pillar_sort_link(label, column)
+      def pillar_sort_link(pillar, name, label)
+        column           = pillar.sort.columns[name]
+        direction        = column.next_direction(params)
+        param_hash       = pillar.sort.param(column.param, direction)
+
+        param_hash[pillar.paginate.param] = nil if pillar.paginate
+
         link_to(
           pillar_sort_label(label, column_icon(column, params)),
-          current_path_with_params(direction: column.next_direction(params), sort: column.param, page: nil)
+          current_path_with_params(param_hash)
         )
       end
 

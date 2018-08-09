@@ -1,43 +1,35 @@
+require "active_support/core_ext/hash/indifferent_access"
+
 module Pillar
   class Sort
 
-    attr_reader :param
-    attr_reader :default_direction
+    attr_reader :columns
 
-    DEFAULT_SCOPE = ->(param, direction, query) { query.order(param.to_sym => direction.to_sym) }
-
-    def initialize(args)
-      raise ArgumentError, "parameter 'param:' is required for pillar :sort" if args&.fetch(:param).nil?
-
-      @param             = args&.delete(:param)
-      @scope             = args&.delete(:scope) || DEFAULT_SCOPE.curry.call(@param)
-      @default_direction = args&.delete(:default_direction) || :asc
+    def initialize
+      @columns = ActiveSupport::HashWithIndifferentAccess.new
     end
 
-    def scope(params)
-      @scope.curry.call(params[:direction] || default_direction.to_s)
+    def add(column)
+      @columns[column.param] = column
     end
 
-    def direction(params)
-      direction   = params[:direction] if selected?(params)
-      direction ||= default_direction.to_s
-
-      return direction
+    def registered_keys
+      @columns.keys.map(&:to_s)
     end
 
-    def next_direction(params)
-      return direction(params) unless selected?(params)
+    def param(name, direction)
+      sort_params       = registered_keys.map { |key| [key, nil] }.to_h
+      sort_params[name] = direction
 
-      case direction(params)
-      when "asc"
-        "desc"
-      when "desc"
-        "asc"
-      end
+      return sort_params
     end
 
-    def selected?(params)
-      params[:sort] == param.to_s
+    def scope(query, params)
+      param_keys = params&.keys&.map(&:to_s) 
+      sort_keys  = param_keys & registered_keys # filter out non sort keys
+      selected   = sort_keys&.first || registered_keys.first.to_sym
+
+      @columns[selected].scope(query, params)
     end
 
   end

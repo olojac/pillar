@@ -5,9 +5,10 @@ class PaginateTest < ActiveSupport::TestCase
   test "with default params" do
     klass = Class.new {
       include Pillar
-      pillar :paginate
+      pillar :paginate, :page
     }
-    query = klass.pillar.query(Support::MockQuery.new).with(:paginate, {})
+    params = {}
+    query  = klass.pillar.query(Support::MockQuery.new, params)
 
     assert(query.methods_called == [:limit, :offset])
     assert(query.args_called    == [[20], [0]])
@@ -16,9 +17,10 @@ class PaginateTest < ActiveSupport::TestCase
   test "with default params on a different page" do
     klass = Class.new {
       include Pillar
-      pillar :paginate
+      pillar :paginate, :page
     }
-    query = klass.pillar.query(Support::MockQuery.new).with(:paginate, page: 4)
+    params = { page: 4 }
+    query  = klass.pillar.query(Support::MockQuery.new, params)
 
     assert(query.methods_called == [:limit, :offset])
     assert(query.args_called    == [[20], [60]]) # (page - 1) * 20
@@ -27,9 +29,10 @@ class PaginateTest < ActiveSupport::TestCase
   test "with different param name" do
     klass = Class.new {
       include Pillar
-      pillar :paginate, param: :sida
+      pillar :paginate, :sida
     }
-    query = klass.pillar.query(Support::MockQuery.new).with(:paginate, sida: 4)
+    params = { sida: 4 }
+    query = klass.pillar.query(Support::MockQuery.new, params)
 
     assert(query.methods_called == [:limit, :offset])
     assert(query.args_called    == [[20], [60]])
@@ -38,9 +41,10 @@ class PaginateTest < ActiveSupport::TestCase
   test "with a diffrent per_page" do
     klass = Class.new {
       include Pillar
-      pillar :paginate, per_page: 10
+      pillar :paginate, :page, per_page: 10
     }
-    query = klass.pillar.query(Support::MockQuery.new).with(:paginate, page: 11)
+    params = { page: 11 }
+    query  = klass.pillar.query(Support::MockQuery.new, params)
 
     assert(query.methods_called == [:limit, :offset])
     assert(query.args_called    == [[10], [100]])
@@ -49,9 +53,10 @@ class PaginateTest < ActiveSupport::TestCase
   test "with a custom scope" do
     klass = Class.new {
       include Pillar
-      pillar :paginate, scope: ->(per_page, page, query) { query.stop_after(per_page).move((page - 1) * per_page) }
+      pillar :paginate, :page, scope: ->(per_page, page) { stop_after(per_page).move((page - 1) * per_page) }
     }
-    query = klass.pillar.query(Support::MockQuery.new).with(:paginate, page: 11)
+    params = { page: 11 }
+    query  = klass.pillar.query(Support::MockQuery.new, params)
 
     assert(query.methods_called == [:stop_after, :move])
     assert(query.args_called    == [[20], [200]])
@@ -60,7 +65,7 @@ class PaginateTest < ActiveSupport::TestCase
   test "#pages with many pages" do
     klass = Class.new {
       include Pillar
-      pillar :paginate, per_page: 10
+      pillar :paginate, :page, per_page: 10
     }
     pages = klass.pillar.paginate.pages(30, 1000)
 
@@ -70,7 +75,7 @@ class PaginateTest < ActiveSupport::TestCase
   test "#pages will not show" do
     klass = Class.new {
       include Pillar
-      pillar :paginate, per_page: 10
+      pillar :paginate, :page, per_page: 10
     }
     pages = klass.pillar.paginate.pages(1, 3)
 
@@ -80,7 +85,7 @@ class PaginateTest < ActiveSupport::TestCase
   test "#pages with few pages" do
     klass = Class.new {
       include Pillar
-      pillar :paginate, per_page: 10
+      pillar :paginate, :page, per_page: 10
     }
     pages = klass.pillar.paginate.pages(2, 30)
     
@@ -90,7 +95,7 @@ class PaginateTest < ActiveSupport::TestCase
   test "#pages at end of list" do
     klass = Class.new {
       include Pillar
-      pillar :paginate, per_page: 10
+      pillar :paginate, :page, per_page: 10
     }
     pages = klass.pillar.paginate.pages(100, 1000)
     
@@ -100,7 +105,7 @@ class PaginateTest < ActiveSupport::TestCase
   test "#pages at begining of list" do
     klass = Class.new {
       include Pillar
-      pillar :paginate, per_page: 10
+      pillar :paginate, :page, per_page: 10
     }
     pages = klass.pillar.paginate.pages(1, 1000)
     

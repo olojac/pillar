@@ -8,7 +8,7 @@ module ViewHelpers
     test "helpers basic function" do
       klass = Class.new {
         include Pillar
-        pillar :paginate
+        pillar :paginate, :page
       }
       params[:page] = "3"
       
@@ -25,7 +25,7 @@ module ViewHelpers
             '<li class="page-item disabled"><span class="page-link">...</span></li>' \
             '<li class="page-item"><a class="page-link" href="test">50</a>' \
           '</ul>',
-          pillar_paginate(klass.pillar.paginate, 1000)
+          pillar_paginate(klass.pillar, 1000)
         )
       end
     end

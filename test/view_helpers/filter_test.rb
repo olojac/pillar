@@ -8,7 +8,7 @@ module ViewHelpers
     test "helpers basic function" do
       klass = Class.new {
         include Pillar
-        pillar :filter, on: [:name, :email]
+        pillar :filter, :filter, on: [:name, :email]
       }
       
       stub :url_for, "test" do
@@ -23,7 +23,7 @@ module ViewHelpers
               '</div>' \
             '</div>' \
           '</form>',
-          pillar_filter(klass.pillar.filter)
+          pillar_filter(klass.pillar)
         )
       end
     end

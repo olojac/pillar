@@ -5,20 +5,48 @@ class SortTest < ActiveSupport::TestCase
   test "with default params" do
     klass = Class.new {
       include Pillar
-      pillar :sort, param: :name
+      pillar :sort, :name
     }
-    query = klass.pillar.query(Support::MockQuery.new).with(:sort, {})
+    params = {}
+    query  = klass.pillar.query(Support::MockQuery.new, params)
 
     assert(query.last_method_called == :order)
     assert(query.last_args_called   == [{ name: :asc }])
   end
 
+  test "with default multiple params" do
+    klass = Class.new {
+      include Pillar
+      pillar :sort, :name
+      pillar :sort, :value
+    }
+    params = {}
+    query  = klass.pillar.query(Support::MockQuery.new, params)
+
+    assert(query.last_method_called == :order)
+    assert(query.last_args_called   == [{ name: :asc }])
+  end
+
+  test "with multiple params" do
+    klass = Class.new {
+      include Pillar
+      pillar :sort, :name
+      pillar :sort, :value
+    }
+    params = { value: "asc" }
+    query  = klass.pillar.query(Support::MockQuery.new, params)
+
+    assert(query.last_method_called == :order)
+    assert(query.last_args_called   == [{ value: :asc }])
+  end
+
   test "with a direction" do
     klass = Class.new {
       include Pillar
-      pillar :sort, param: :name
+      pillar :sort, :name
     }
-    query = klass.pillar.query(Support::MockQuery.new).with(:sort, direction: "desc")
+    params = { name: "desc" }
+    query  = klass.pillar.query(Support::MockQuery.new, params)
 
     assert(query.last_method_called == :order)
     assert(query.last_args_called   == [{ name: :desc }])
@@ -27,9 +55,10 @@ class SortTest < ActiveSupport::TestCase
   test "with a default direction" do
     klass = Class.new {
       include Pillar
-      pillar :sort, param: :name, default_direction: :desc
+      pillar :sort, :name, default_direction: :desc
     }
-    query = klass.pillar.query(Support::MockQuery.new).with(:sort, {})
+    params = {}
+    query  = klass.pillar.query(Support::MockQuery.new, params)
 
     assert(query.last_method_called == :order)
     assert(query.last_args_called   == [{ name: :desc }])
@@ -38,9 +67,10 @@ class SortTest < ActiveSupport::TestCase
   test "with a custom scope" do
     klass = Class.new {
       include Pillar
-      pillar :sort, param: :name, scope: ->(direction, query) { query.custom("name #{direction}") }
+      pillar :sort, :name, scope: ->(direction) { custom("name #{direction}") }
     }
-    query = klass.pillar.query(Support::MockQuery.new).with(:sort, {})
+    params = {}
+    query  = klass.pillar.query(Support::MockQuery.new, params)
 
     assert(query.last_method_called == :custom)
     assert(query.last_args_called   == ["name asc"])
@@ -58,30 +88,30 @@ class SortTest < ActiveSupport::TestCase
   test "helpers with default direction" do
     klass = Class.new {
       include Pillar
-      pillar :sort, param: :name
+      pillar :sort, :name
     }
-    column = klass.pillar.sort[:name]
+    column = klass.pillar.sort.columns[:name]
 
     # selected
-    params = { sort: "name" }
+    params = { name: "asc" }
     assert(column.direction(params)      == "asc")
     assert(column.next_direction(params) == "desc")
     assert(column.selected?(params)      == true)
 
     # selected with direction
-    params = { sort: "name", direction: "desc" }
+    params = { name: "desc" }
     assert(column.direction(params)      == "desc")
     assert(column.next_direction(params) == "asc")
     assert(column.selected?(params)      == true)
 
     # not selected
-    params = { sort: "other" }
+    params = { other: "asc" }
     assert(column.direction(params)      == "asc")
     assert(column.next_direction(params) == "asc")
     assert(column.selected?(params)      == false)
 
     # not selected with direction
-    params = { sort: "other", direction: "desc" }
+    params = { other: "desc" }
     assert(column.direction(params)      == "asc")
     assert(column.next_direction(params) == "asc")
     assert(column.selected?(params)      == false)
@@ -90,30 +120,30 @@ class SortTest < ActiveSupport::TestCase
   test "helpers with reverse default direction" do
     klass = Class.new {
       include Pillar
-      pillar :sort, param: :name, default_direction: :desc
+      pillar :sort, :name, default_direction: :desc
     }
-    column = klass.pillar.sort[:name]
+    column = klass.pillar.sort.columns[:name]
 
     # selected
-    params = { sort: "name" }
+    params = { name: "desc" }
     assert(column.direction(params)      == "desc")
     assert(column.next_direction(params) == "asc")
     assert(column.selected?(params)      == true)
 
     # selected with direction
-    params = { sort: "name", direction: "asc" }
+    params = { name: "asc" }
     assert(column.direction(params)      == "asc")
     assert(column.next_direction(params) == "desc")
     assert(column.selected?(params)      == true)
 
     # not selected
-    params = { sort: "other" }
+    params = { other: "desc" }
     assert(column.direction(params)      == "desc")
     assert(column.next_direction(params) == "desc")
     assert(column.selected?(params)      == false)
 
     # not selected with direction
-    params = { sort: "other", direction: "asc" }
+    params = { other: "asc" }
     assert(column.direction(params)      == "desc")
     assert(column.next_direction(params) == "desc")
     assert(column.selected?(params)      == false)

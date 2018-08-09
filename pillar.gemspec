@@ -23,6 +23,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "actionview",       ">= 4.2"
   spec.add_development_dependency "actionpack",       ">= 4.2"
   spec.add_development_dependency "minitest",         "~> 5.0"
+  spec.add_development_dependency "m",                "~> 1.5.1"
   spec.add_development_dependency "minitest-reporters"
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "rake"

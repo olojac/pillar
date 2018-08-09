@@ -5,9 +5,10 @@ class FilterTest < ActiveSupport::TestCase
   test "with defaults" do
     klass = Class.new {
       include Pillar
-      pillar :filter, on: [:name, :email]
+      pillar :filter, :filter, on: [:name, :email]
     }
-    query = klass.pillar.query(Support::MockQuery.new).with(:filter, filter: "test")
+    params = { filter: "test" }
+    query  = klass.pillar.query(Support::MockQuery.new, params)
 
     assert(query.last_method_called == :where)
     assert(query.last_args_called   == ["name ILIKE (:term) && email ILIKE (:term)", term: "%test%"])
@@ -16,9 +17,10 @@ class FilterTest < ActiveSupport::TestCase
   test "with different param name" do
     klass = Class.new {
       include Pillar
-      pillar :filter, param: :search, on: [:name, :email]
+      pillar :filter, :search, on: [:name, :email]
     }
-    query = klass.pillar.query(Support::MockQuery.new).with(:filter, search: "test")
+    params = { search: "test" }
+    query  = klass.pillar.query(Support::MockQuery.new, params)
 
     assert(query.last_method_called == :where)
     assert(query.last_args_called   == ["name ILIKE (:term) && email ILIKE (:term)", term: "%test%"])
@@ -27,9 +29,10 @@ class FilterTest < ActiveSupport::TestCase
   test "with custom scope" do
     klass = Class.new {
       include Pillar
-      pillar :filter, scope: ->(term, query) { query.search("name LIKE (:term)", term: "%#{term}%") }
+      pillar :filter, :filter, scope: ->(term) { search("name LIKE (:term)", term: "%#{term}%") }
     }
-    query = klass.pillar.query(Support::MockQuery.new).with(:filter, filter: "test")
+    params = { filter: "test" }
+    query  = klass.pillar.query(Support::MockQuery.new, params)
 
     assert(query.last_method_called == :search)
     assert(query.last_args_called   == ["name LIKE (:term)", term: "%test%"])

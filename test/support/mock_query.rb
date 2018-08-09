@@ -1,5 +1,5 @@
 module Support
-  class MockQuery < BasicObject
+  class MockQuery
 
     CATCH = [:order, :custom, :limit, :offset, :stop_after, :move, :where, :search].freeze
 

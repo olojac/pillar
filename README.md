@@ -4,11 +4,10 @@ Pillar in a lightweight and flexible gem for sorting and paginating tables and l
 
 - Lightweight:
   - Only ruby, no javascript
-  - No dependecies except for rails
+  - Activesupport is the only dependecies
   - Only adds one method to your model
 - Flexible
-  - Can be include to both models and "view objects"
-  - You can easily specify your ordering and pagination scopes, should work with almost every ORM
+  - Can be included to any class
   - Replace labels and icons by overrighting default view helpers
   - Default values for ActiveRecord
 
@@ -24,16 +23,16 @@ Include Pillar to the class you want to use. It dosn't need to be a model, pilla
 
 Specify your sorting and paginating scopes:
 
-
 ```ruby
 class MyModel < ApplicationRecord
   include Pillar
 
-  pillar :sort,     param: :name
-  pillar :sort,     param: :value
-  pillar :sort,     param: :created_at
-  pillar :sort,     param: :updated_at
-  pillar :paginate, param: :page
+  pillar :sort,     :name
+  pillar :sort,     :value
+  pillar :sort,     :created_at
+  pillar :sort,     :updated_at
+  pillar :filter,   :search, on: [:name, :email]
+  pillar :paginate, :page
     
   # ...
 end
@@ -47,7 +46,7 @@ class MyController < ApplicationController
   def index
     @query  = MyModel.all
     @pillar = MyModel.pillar
-    @items  = @pillar.query(@query).with(:sort, :paginate, params)
+    @items  = @pillar.query(@query, params)
     # @total_count = @query.count
   end
 
@@ -59,13 +58,13 @@ Add helpers to your views:
 
 ```ruby
 # sort link for updated_at
-pillar_sort_link("Updated At", @pillar.updated_at)
+pillar_sort_link(@pillar, :updated_at, "Updated At")
 
 # paginate link for prev/next buttons
-pillar_paginate(@pillar.paginate)
+pillar_paginate(@pillar)
 
 # optional, add total number of elements to avoid displaying empty pages
-pillar_paginate(@pillar.paginate, @total_count)
+pillar_paginate(@pillar, @total_count)
 ```
 
 Customize labels and icons by overriding the following view helpers:
@@ -73,20 +72,11 @@ Customize labels and icons by overriding the following view helpers:
 ```ruby
 # view helpers with default values
 
-def pillar_sort_asc_icon
-  "⯅"
-end
+pillar_sort_asc_icon       # default: "⯅"
+pillar_sort_desc_icon      # default: "⯆"
+pillar_paginate_next_label # default: "Next ⯈""
+pillar_paginate_prev_label # default: "⯇ Prev"
 
-def pillar_sort_desc_icon
-  "⯆"
-end
-
-def pillar_paginate_next_label
-  "Next ⯈"
-end
-
-def pillar_paginate_prev_label
-  "⯇ Prev"
-end
+# see lib/pillar/view_helpers for more
 ```
 

@@ -2,9 +2,9 @@ module Pillar
   module ViewHelpers
     module Paginate
 
-      def pillar_paginate(store, item_count)
-        current = store.page(params)
-        pages   = store.pages(current, item_count)
+      def pillar_paginate(pillar, item_count)
+        current = pillar.paginate.page(params)
+        pages   = pillar.paginate.pages(current, item_count)
 
         content_tag(:ul, class: "pagination") {
           pages.each { |page|

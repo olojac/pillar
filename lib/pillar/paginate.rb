@@ -1,17 +1,25 @@
 module Pillar
   class Paginate
 
-    DEFAULT_SCOPE = ->(per_page, page, query) { query.limit(per_page).offset((page - 1) * per_page) }
+    DEFAULT_SCOPE = ->(per_page, page) { limit(per_page).offset((page - 1) * per_page) }
 
-    def initialize(args = {})
+    attr_reader :param
+
+    def initialize(param = nil, args = {})
       args    ||= {}
-      @param    = args&.delete(:param)    || :page
-      @scope    = args&.delete(:scope)    || DEFAULT_SCOPE
+      @param    = param
       @per_page = args&.delete(:per_page) || 20
+      @scope    = args&.delete(:scope) || DEFAULT_SCOPE
     end
 
-    def scope(params)
-      @scope.curry.call(@per_page, page(params))
+    def scope(query, params)
+      # note: curry dosn't work with instance_exec
+      case @scope.arity
+      when 2
+        query.instance_exec(@per_page, page(params), &@scope)
+      else
+        query.instance_exec(page(params), &@scope)
+      end
     end
 
     def pages(current, item_count)
