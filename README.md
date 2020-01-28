@@ -79,4 +79,3 @@ pillar_paginate_prev_label # default: "⯇ Prev"
 
 # see lib/pillar/view_helpers for more
 ```
-
