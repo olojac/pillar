@@ -33,7 +33,7 @@ class MyModel < ApplicationRecord
   pillar :sort,     :updated_at
   pillar :filter,   :search, on: [:name, :email]
   pillar :paginate, :page
-    
+
   # ...
 end
 ```
